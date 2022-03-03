@@ -16,6 +16,8 @@ def open_instance(path):
     Open the MKP instances and create the needed variables (nbr instances, objects, knapsack)
 
     :param path: The path to the file
+
+    :rtype: (list, list, int)
     :return: Each item, the knapsack size and the optimum value of the problem (0 if unknown)
     """
 
@@ -78,13 +80,10 @@ def open_instance(path):
 
     return items, knapsack, optimum_value
 
-# open_instance("instances/sac94/hp/hp1.dat")
-# open_instance("instances/chubeas/OR5x100/OR5x100.dat")
-
 
 class Knapsack:
     """
-    Class Knapsack represents a knapsack as a binary list
+    Class Knapsack represents a multidimensional 0-1 knapsack as a binary list
     where a 0 represents the lack of an item, and 1 the presence of an item
     """
 
@@ -99,12 +98,34 @@ class Knapsack:
         self.ks = [0] * len(list_items)
         if Knapsack.items is None:
             Knapsack.items = list_items
+            print(Knapsack.items)
 
     def fit(self):
         """
-        Calculate the fitness of the knapsack (based on pseudo utility ?)
+        Calculate the fitness of the knapsack
 
-        :return: The fitness of the knapsack
+        :rtype: int
+        :return: The fitness of the knapsack, or 0 if the constraints are not respected
         """
+        if self.respect_constraints():
+            # Sum of all profits of the items in the knapsack
+            return sum([Knapsack.items[i].profit for i, val in enumerate(self.ks) if val == 1])
+        else:
+            return 0
+
+    def pseudo_utility(self):
         pass
 
+    def respect_constraints(self):
+        """
+        Check the constraints on the knapsack
+
+        :rtype: bool
+        :return: A boolean True if the constraints are respected, False otherwise
+        """
+        for weight_i in range(self.constraints):
+            # Sum of all weight of the items in the knapsack for the dimension weight_i
+            if self.constraints[weight_i] > \
+                    sum([Knapsack.items[i].weight[weight_i] for i, val in enumerate(self.ks) if val == 1]):
+                return False
+        return True

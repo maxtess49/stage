@@ -20,10 +20,13 @@
 - General algorithm
 
 ### DOING
-- Implementation of the Multi dimensional Knapsack Problem
-  - [ ] Model
-  - [ ] Fitness function
+- bGWO
+  - [ ] Make an algorithm from scratch
+    - [ ] Initialisation
+    - [ ] Frame
 
 ### DONE
 - Implementation of the Multi dimensional Knapsack Problem
   - [X] Initialization of instances
+  - [X] Model
+  - [X] Fitness function
