@@ -1,12 +1,15 @@
 class Item:
+    """
+    Class Item represents each item of the knapsack problem with its profit and weights for each dimension
+    """
 
     def __init__(self):
         self.profit = 0
         self.weight = []
 
-
     def __str__(self):
         return "Profit: " + str(self.profit) + " Weight: " + str(self.weight)
+
 
 def open_instance(path):
     """
@@ -20,8 +23,6 @@ def open_instance(path):
     items = []
     knapsack = []
 
-    nbr_items = 0
-    nbr_constraints = 0
     optimum_value = 0
 
     with open(path, "r") as file:
@@ -75,7 +76,35 @@ def open_instance(path):
             # For next iteration
             firstLine = file.readline()[1:].split(" ")[:-1]
 
-    return (items, knapsack, optimum_value)
+    return items, knapsack, optimum_value
 
-#open_instance("instances/sac94/hp/hp1.dat")
-#open_instance("instances/chubeas/OR5x100/OR5x100.dat")
+# open_instance("instances/sac94/hp/hp1.dat")
+# open_instance("instances/chubeas/OR5x100/OR5x100.dat")
+
+
+class Knapsack:
+    """
+    Class Knapsack represents a knapsack as a binary list
+    where a 0 represents the lack of an item, and 1 the presence of an item
+    """
+
+    items = None
+
+    def __init__(self, size, list_items):
+        """
+        :param size: Nbr of different items that can be added to the knapsack
+        :param list_items: The list of different items of the problem
+        """
+        self.constraints = size
+        self.ks = [0] * len(list_items)
+        if Knapsack.items is None:
+            Knapsack.items = list_items
+
+    def fit(self):
+        """
+        Calculate the fitness of the knapsack (based on pseudo utility ?)
+
+        :return: The fitness of the knapsack
+        """
+        pass
+

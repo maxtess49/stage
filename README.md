@@ -3,7 +3,7 @@
 
 ### Objectives: 
     - Implement bGWO, bMS, bABC 
-    - Develop a kind of general algorithm metaheuristics
+    - Develop a kind of general metaheuristics algorithm from those
 
 ### TODO
 - bGWO
@@ -22,6 +22,8 @@
 ### DOING
 - Implementation of the Multi dimensional Knapsack Problem
   - [ ] Model
-  - [ ] Initialization of instances
+  - [ ] Fitness function
 
 ### DONE
+- Implementation of the Multi dimensional Knapsack Problem
+  - [X] Initialization of instances
