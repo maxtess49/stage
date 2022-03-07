@@ -93,9 +93,9 @@ class Knapsack:
     def __init__(self, size, list_items):
         """
         :param size: List of constraints for the knapsack
-        :type size: list
+        :type size: list of int
         :param list_items: The list of the different items of the problem
-        :type list_items: list
+        :type list_items: list of Item
         """
         self.constraints = size
         self.ks = [0] * len(list_items)

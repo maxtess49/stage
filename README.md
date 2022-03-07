@@ -11,9 +11,9 @@
   - [ ] Find where to generalize and make a framework
     - Initialisation
     - Identify leaders (selection)
-    - Estimate the position of the prey 
+    - Estimate the position of the prey (??)
     - Generate solution (mutate)
-    - Update population
+    - Update population (Insertion)
   - [ ] (optionnal) make it with the deap library
 - bMS
 - bABC
@@ -22,7 +22,11 @@
 ### DOING
 - bGWO
   - [ ] Make an algorithm from scratch
-    - [ ] Initialisation
+    - [X] Initialisation
+    - [X] Identify leaders (selection)
+    - [X] Estimate the position of the prey (??)
+    - [ ] Generate solution (mutate)
+    - [ ] Update population (Insertion)
     - [X] Frame
 
 ### DONE
