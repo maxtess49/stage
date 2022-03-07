@@ -23,7 +23,7 @@
 - bGWO
   - [ ] Make an algorithm from scratch
     - [ ] Initialisation
-    - [ ] Frame
+    - [X] Frame
 
 ### DONE
 - Implementation of the Multi dimensional Knapsack Problem

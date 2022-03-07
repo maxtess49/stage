@@ -16,6 +16,7 @@ def open_instance(path):
     Open the MKP instances and create the needed variables (nbr instances, objects, knapsack)
 
     :param path: The path to the file
+    :type path: string
 
     :rtype: (list, list, int)
     :return: Each item, the knapsack size and the optimum value of the problem (0 if unknown)
@@ -65,7 +66,7 @@ def open_instance(path):
                 for weight in line:
                     if j % nbr_items == 0:
                         j = 0
-                    items[instance][j].weight += [weight]
+                    items[instance][j].weight += [int(weight)]
                     j += 1
                 i += len(line)
 
@@ -91,14 +92,28 @@ class Knapsack:
 
     def __init__(self, size, list_items):
         """
-        :param size: Nbr of different items that can be added to the knapsack
-        :param list_items: The list of different items of the problem
+        :param size: List of constraints for the knapsack
+        :type size: list
+        :param list_items: The list of the different items of the problem
+        :type list_items: list
         """
         self.constraints = size
         self.ks = [0] * len(list_items)
         if Knapsack.items is None:
             Knapsack.items = list_items
-            print(Knapsack.items)
+
+    @staticmethod
+    def set_items(list_items):
+        """
+        Set the class variable items
+
+        :param list_items: The list of the different items of the problem
+        :type list_items: list
+        """
+        Knapsack.items = list_items
+
+    def set_knapsack(self, ks):
+        self.ks = ks
 
     def fit(self):
         """
@@ -113,7 +128,9 @@ class Knapsack:
         else:
             return 0
 
+    # Several ways of doing it
     def pseudo_utility(self):
+        # TODO
         pass
 
     def respect_constraints(self):
@@ -123,9 +140,9 @@ class Knapsack:
         :rtype: bool
         :return: A boolean True if the constraints are respected, False otherwise
         """
-        for weight_i in range(self.constraints):
+        for weight_i in range(len(self.constraints)):
             # Sum of all weight of the items in the knapsack for the dimension weight_i
-            if self.constraints[weight_i] > \
+            if self.constraints[weight_i] < \
                     sum([Knapsack.items[i].weight[weight_i] for i, val in enumerate(self.ks) if val == 1]):
                 return False
         return True
