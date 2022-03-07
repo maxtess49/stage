@@ -25,7 +25,8 @@
     - [X] Initialisation
     - [X] Identify leaders (selection)
     - [X] Estimate the position of the prey (??)
-    - [ ] Generate solution (mutate)
+    - [X] Generate solution (mutate)
+      - [ ] Repair
     - [ ] Update population (Insertion)
     - [X] Frame
 
@@ -34,3 +35,10 @@
   - [X] Initialization of instances
   - [X] Model
   - [X] Fitness function
+
+
+### Dependencies
+### \TODO
+
+### Launch
+### \TODO

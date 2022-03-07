@@ -113,6 +113,12 @@ class Knapsack:
         Knapsack.items = list_items
 
     def set_knapsack(self, ks):
+        """
+        Set the knapsack list
+
+        :param ks: A binary list representing a knapsack
+        :type ks: list of int
+        """
         self.ks = ks
 
     def fit(self):
