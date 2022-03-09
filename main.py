@@ -1,3 +1,6 @@
+import numpy as np
+from scipy.optimize import linprog
+
 class Item:
     """
     Class Item represents each item of the knapsack problem with its profit and weights for each dimension
@@ -86,9 +89,14 @@ class Knapsack:
     """
     Class Knapsack represents a multidimensional 0-1 knapsack as a binary list
     where a 0 represents the lack of an item, and 1 the presence of an item
+
+    items: list of Item \n
+    pseudo_utilities: list of int (represents the descending order of the pseudo utility)
+
     """
 
     items = None
+    pseudo_utilities = None
 
     def __init__(self, size, list_items):
         """
@@ -101,6 +109,8 @@ class Knapsack:
         self.ks = [0] * len(list_items)
         if Knapsack.items is None:
             Knapsack.items = list_items
+        if Knapsack.pseudo_utilities is None:
+            Knapsack.pseudo_utilities = Knapsack.pseudo_utility(self)
 
     @staticmethod
     def set_items(list_items):
@@ -136,8 +146,32 @@ class Knapsack:
 
     # Several ways of doing it
     def pseudo_utility(self):
-        # TODO
-        pass
+        """
+        Compute the pseudo utility of each item (linear relaxation of MKP)
+
+        :rtype: list of float
+        :return: The pseudo utility of each Item
+        """
+
+        # constraints + ones
+        constraints = np.concatenate((self.constraints, np.ones(len(Knapsack.items))))
+        # weights of items
+        weight = np.array([item.weight for item in Knapsack.items])
+        # inverse of weight + identity matrix
+        i_weight = - np.concatenate((weight, np.eye(len(Knapsack.items))), axis=1)
+        # Inverse of profits
+        i_profit = - np.array([item.profit for item in Knapsack.items])
+
+        # Compute the linear relaxation of MKP
+        result = linprog(constraints, i_weight, i_profit)
+
+        if result.success:
+            shadow_price = result.x[:len(self.constraints)]
+            pseudo_utilities = (-i_profit).T / (np.matmul(shadow_price.T, weight.T))
+
+            return (- pseudo_utilities).argsort()
+        else:
+            return None
 
     def respect_constraints(self):
         """

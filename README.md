@@ -20,14 +20,18 @@
 - General algorithm
 
 ### DOING
+- Implementation of the Multi dimensional Knapsack Problem
+  - [ ] Pseudo utility
 - bGWO
   - [ ] Make an algorithm from scratch
-    - [X] Initialisation
+    - [X] Initialisation pseudo utility
+    - [X] Initialisation 0
+    - [X] Initialisation random
     - [X] Identify leaders (selection)
     - [X] Estimate the position of the prey (??)
     - [X] Generate solution (mutate)
       - [ ] Repair
-    - [ ] Update population (Insertion)
+    - [X] Update population (Insertion)
     - [X] Frame
 
 ### DONE
@@ -38,7 +42,8 @@
 
 
 ### Dependencies
-### \TODO
+- numpy
+- scipy
 
 ### Launch
 ### \TODO
