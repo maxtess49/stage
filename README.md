@@ -7,7 +7,6 @@
 
 ### TODO
 - bGWO
-  - [ ] Make an algorithm from scratch
   - [ ] Find where to generalize and make a framework
     - Initialisation
     - Identify leaders (selection)
@@ -20,25 +19,27 @@
 - General algorithm
 
 ### DOING
-- Implementation of the Multi dimensional Knapsack Problem
-  - [ ] Pseudo utility
-- bGWO
-  - [ ] Make an algorithm from scratch
-    - [X] Initialisation pseudo utility
-    - [X] Initialisation 0
-    - [X] Initialisation random
-    - [X] Identify leaders (selection)
-    - [X] Estimate the position of the prey (??)
-    - [X] Generate solution (mutate)
-      - [ ] Repair
-    - [X] Update population (Insertion)
-    - [X] Frame
+- bGWO 
+  - [ ] Debug & make it work
 
 ### DONE
 - Implementation of the Multi dimensional Knapsack Problem
   - [X] Initialization of instances
   - [X] Model
   - [X] Fitness function
+  - [X] Pseudo utility
+
+- bGWO
+  - [X] Make an algorithm from scratch
+    - [X] Initialisation pseudo utility
+    - [X] Initialisation 0
+    - [X] Initialisation random
+    - [X] Identify leaders (selection)
+    - [X] Estimate the position of the prey (??)
+    - [X] Generate solution (mutate)
+      - [X] Repair
+    - [X] Update population (Insertion)
+    - [X] Frame
 
 
 ### Dependencies
