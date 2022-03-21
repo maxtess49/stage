@@ -1,9 +1,9 @@
-from mkp import *
-import random
 import math
+import random
 
-items, knapsack, optimum = open_instance("../instances/gk/gk01.dat")
+import numpy as np
 
+from mkp import *
 
 # Accumulated resources as list of dimensions ?
 def pop_init_pseudo(population_size, list_items, list_constraints):
@@ -23,7 +23,7 @@ def pop_init_pseudo(population_size, list_items, list_constraints):
     population = []
 
     for k in range(population_size):
-        accumulated_resources = [0]*len(list_constraints)
+        accumulated_resources = [0] * len(list_constraints)
         ks = Knapsack(list_constraints, list_items)
         for j in Knapsack.pseudo_utilities:
             # In descending of the pseudo utility
@@ -31,40 +31,17 @@ def pop_init_pseudo(population_size, list_items, list_constraints):
             # Test if all accumulated resources + new object are inferior to the constraints of the ks
             if random.random() < 0.5 \
                     and False not in [x < y for x, y in
-                                      zip([a+b for a, b in
+                                      zip([a + b for a, b in
                                            zip(accumulated_resources, list_items[j].weight)], ks.constraints)]:
                 ks.ks[j] = 1
                 # doesn't compute fitness as it is calculated via a method of ks
                 # fitness = fit(ks)
 
                 # Add all sizes of current item to the accumulated resources
-                accumulated_resources = [x+y for x, y in zip(accumulated_resources, list_items[j].weight)]
+                accumulated_resources = [x + y for x, y in zip(accumulated_resources, list_items[j].weight)]
         ks.fit()
         population += [ks]
 
-    return population
-
-
-def pop_init_zero(population_size, list_items, list_constraints):
-    """
-    Initialize a population of "elite" solutions
-
-    :param population_size: Size of the population
-    :type population_size: int
-    :param list_items: List of items for the MKP
-    :type list_items: list of Item
-    :param list_constraints: List of constraints for this knapsack
-    :type list_constraints: list of int
-
-    :rtype: list of Knapsack
-    :return: The population
-    """
-    population = []
-
-    for k in range(population_size):
-        ks = Knapsack(list_constraints, list_items)
-        ks.ks = [0]*len(list_items)
-        population += [ks]
     return population
 
 
@@ -81,7 +58,7 @@ def select_wolves(population):
     return sorted(population, key=lambda x: x.fitness)[:3]
 
 
-def generate_prey(alpha, beta, delta):
+def generate_prey(alpha, beta, delta, iteration):
     """
     Generate the solution we search (the prey)
 
@@ -91,6 +68,8 @@ def generate_prey(alpha, beta, delta):
     :type beta: Knapsack
     :param delta: The delta wolf
     :type delta: Knapsack
+    :param iteration: The iteration the algorithm is at
+    :type iteration: int
 
     :rtype: list of float
     :return: The "prey" as a list of float
@@ -98,16 +77,17 @@ def generate_prey(alpha, beta, delta):
     total_fitness = alpha.fitness + beta.fitness + delta.fitness
 
     if total_fitness != 0:
-        weightA = alpha.fitness/total_fitness
-        weightB = beta.fitness/total_fitness
-        weightD = delta.fitness/total_fitness
+        weightA = alpha.fitness / total_fitness
+        weightB = beta.fitness / total_fitness
+        weightD = delta.fitness / total_fitness
     else:
         weightA = 0
         weightB = 0
         weightD = 0
 
-    return [alpha.ks[x]*weightA+beta.ks[x]*weightB+delta.ks[x]*weightD
-            for x in range(len(alpha.ks))]
+    # Should remove the "5000" to make it a variable
+    return [alpha.ks[x] * weightA + beta.ks[x] * weightB + delta.ks[x] * weightD +
+            np.random.normal(0, math.exp(-100*iteration/5000)) for x in range(len(alpha.ks))]
 
 
 # Generate a trial solution
@@ -132,6 +112,8 @@ def generate_sol(prey, individual, transform_function=math.tanh):
     ks = Knapsack(individual.constraints, individual.items)
     ks.ks = trial[:]
 
+    ks.fit()
+
     return ks
 
 
@@ -155,19 +137,23 @@ def repair(individual):
         if False in [res <= const for res, const in zip(resource_consumption, individual.constraints)]:
             if individual.ks[i] == 1:
                 individual.ks[i] = 0
-                for j in range(len(Knapsack.items[i].weight)):
-                    resource_consumption[j] -= Knapsack.items[i].weight[j]
+                resource_consumption = [res - weight for res, weight in
+                                        zip(resource_consumption, Knapsack.items[i].weight)]
+                individual.fitness -= Knapsack.items[i].profit
+        else:
+            break
 
     for i in Knapsack.pseudo_utilities:
-        if not (False in [res+weight <= const for res, const, weight in
+        if not (False in [res + weight <= const for res, const, weight in
                           zip(resource_consumption, individual.constraints, Knapsack.items[i].weight)]):
             if individual.ks[i] == 0:
                 individual.ks[i] = 1
-                for j in range(len(Knapsack.items[i].weight)):
-                    resource_consumption[j] += Knapsack.items[i].weight[j]
-    individual.fit()
+                resource_consumption = [res + weight for res, weight in
+                                        zip(resource_consumption, Knapsack.items[i].weight)]
+                individual.fitness += Knapsack.items[i].profit
 
-def gwo(max_iteration, list_items, list_constraints, population_size):
+
+def gwo(list_items, list_constraints, max_iteration=5000, population_size=20):
     """
     Binary grey wolf optimization algorithm
 
@@ -188,7 +174,7 @@ def gwo(max_iteration, list_items, list_constraints, population_size):
 
     for iteration in range(max_iteration):
         # Estimate location of prey
-        prey = generate_prey(alpha, beta, delta)
+        prey = generate_prey(alpha, beta, delta, iteration)
 
         for individual in pop:
             # Can remove the for loop with list comprehension
@@ -200,32 +186,44 @@ def gwo(max_iteration, list_items, list_constraints, population_size):
             # Intensification I suppose
             if trial_solution.fitness > individual.fitness:
                 individual.ks = trial_solution.ks[:]
-                individual.fit()
+                individual.fitness = trial_solution.fitness
 
                 if trial_solution.fitness > alpha.fitness:
                     alpha.ks = trial_solution.ks[:]
-                    alpha.fit()
+                    alpha.fitness = trial_solution.fitness
 
                 elif trial_solution.fitness > beta.fitness:
                     beta.ks = trial_solution.ks[:]
-                    beta.fit()
+                    beta.fitness = trial_solution.fitness
 
                 elif trial_solution.fitness > delta.fitness:
                     delta.ks = trial_solution.ks[:]
-                    delta.fit()
+                    delta.fitness = trial_solution.fitness
 
             # If the new solution doesn't improve, we update the individual anyway if it isn't a leader
             # Diversification I suppose
             elif individual != alpha and individual != beta and individual != delta:
                 individual.ks = trial_solution.ks[:]
-                individual.fit()
+                individual.fitness = trial_solution.fitness
 
         if iteration % 1000 == 0:
             print(str(iteration) + " : " + str(alpha.fitness))
-
     return alpha
 
 
-sol = gwo(10000, items[0], knapsack[0], 20)
-print(sol.fitness)
-print(optimum)
+# items, knapsack, optimum = open_instance("../instances/gk/gk01.dat")
+# random.seed(10)
+# sol = gwo(items[0], knapsack[0])
+# print(sol.fitness)
+# print(optimum)
+
+# pop = pop_init_pseudo(20, items[0], knapsack[0])
+# alpha, beta, delta = select_wolves(pop)
+# for i in range(10000):
+#     prey = generate_prey(alpha, beta, delta)
+#     for individual in pop:
+#         trial_solution = generate_sol(prey, individual)
+#
+#         repair(trial_solution)
+#     if i % 1000 == 0:
+#         print(i)

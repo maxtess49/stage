@@ -140,11 +140,12 @@ class Knapsack:
         """
         Calculate the fitness of the knapsack
         """
-        if self.respect_constraints():
-            # Sum of all profits of the items in the knapsack
-            self.fitness = sum([Knapsack.items[i].profit for i, val in enumerate(self.ks) if val == 1])
-        else:
-            self.fitness = 0
+        # Commented cause repair makes it useless ? (it check if the constraints are respected)
+        # if self.respect_constraints():
+        # Sum of all profits of the items in the knapsack
+        self.fitness = sum([Knapsack.items[i].profit for i, val in enumerate(self.ks) if val == 1])
+        # else:
+        # self.fitness = 0
 
     # Several ways of doing it
     def pseudo_utility(self):
@@ -166,16 +167,13 @@ class Knapsack:
 
         # Compute the linear relaxation of MKP
         # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linprog.html
-        result = linprog(constraints, i_weight, i_profit, method="revised simplex")
-        # print(result)
+        result = linprog(constraints, i_weight, i_profit)
 
         if result.success:
             shadow_price = result.x[:len(self.constraints)]
             pseudo_utilities = (-i_profit).T / (np.matmul(shadow_price.T, weight.T))
 
             return (- pseudo_utilities).argsort()
-        else:
-            return None
 
     def respect_constraints(self):
         """

@@ -19,8 +19,6 @@
 - General algorithm
 
 ### DOING
-- bGWO 
-  - [ ] Debug & make it work
 
 ### DONE
 - Implementation of the Multi dimensional Knapsack Problem
@@ -45,6 +43,8 @@
 ### Dependencies
 - numpy
 - scipy
+
+See requirements.txt
 
 ### Launch
 ### \TODO
