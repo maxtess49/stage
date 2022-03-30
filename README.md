@@ -6,19 +6,24 @@
     - Develop a kind of general metaheuristics algorithm from those
 
 ### TODO
-- bGWO
-  - [ ] Find where to generalize and make a framework
-    - Initialisation
-    - Identify leaders (selection)
-    - Estimate the position of the prey (??)
-    - Generate solution (mutate)
-    - Update population (Insertion)
-  - [ ] (optionnal) make it with the deap library
-- bMS
 - bABC
 - General algorithm
 
 ### DOING
+- bGWO
+  - [ ] Find where to generalize
+- SLMS
+  - [ ] Make an algorithm from scratch
+    - [X] Initialisation random
+    - [X] Generate initial solution
+    - [ ] Generate solution
+      - [X] Repair
+  - [ ] Find where to generalize
+
+- General algorithm
+  - [ ] Get a framework working
+  - [ ] (optionnal) make it with the deap library
+    - [ ] Make MKP model
 
 ### DONE
 - Implementation of the Multi dimensional Knapsack Problem
@@ -32,10 +37,10 @@
     - [X] Initialisation pseudo utility
     - [X] Initialisation 0
     - [X] Initialisation random
-    - [X] Identify leaders (selection)
-    - [X] Estimate the position of the prey (??)
-    - [X] Generate solution (mutate)
-      - [X] Repair
+    - [X] Identify leaders (init)
+    - [X] Estimate the position of the prey (selection part 1 ?)
+    - [X] Generate solution (selection)
+    - [X] Repair (mutate)
     - [X] Update population (Insertion)
     - [X] Frame
 

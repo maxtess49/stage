@@ -4,16 +4,20 @@ from mkp import *
 
 # Parameters
 POPULATION_SIZE = 20
-P_CROSSOVER = 0.0
-P_MUTATION = 1.0
 MAX_GENERATIONS = 5000
 
 
-def multipurpose(init_pop, select, mutate, insert):
-    pop = init_pop()
+def multipurpose(init_pop, select, mutate, insert, items, sizes):
 
-    bests = select()
+    for iteration in range(MAX_GENERATIONS):
+        pop = init_pop(POPULATION_SIZE, items, sizes)
 
-    mutate(pop, bests)
+        bests = select(pop)
 
-    insert(pop, best)
+        mutate(pop, bests)
+
+        insert(pop, bests)
+
+
+items, knapsack, optimum = open_instance("../instances/gk/gk01.dat")
+multipurpose(pop_init_pseudo, select_wolves, repair, "TODO", items[0], knapsack[0])

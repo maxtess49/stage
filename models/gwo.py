@@ -1,11 +1,12 @@
 import math
 import random
 
-import numpy as np
+from models import mkp
+from models.mkp import np
+# import mkp
+# from mkp import np
 
-from mkp import *
 
-# Accumulated resources as list of dimensions ?
 def pop_init_pseudo(population_size, list_items, list_constraints):
     """
     Initialize a population of "elite" solutions
@@ -24,12 +25,12 @@ def pop_init_pseudo(population_size, list_items, list_constraints):
 
     for k in range(population_size):
         accumulated_resources = [0] * len(list_constraints)
-        ks = Knapsack(list_constraints, list_items)
-        for j in Knapsack.pseudo_utilities:
+        ks = mkp.Knapsack(list_constraints, list_items)
+        for j in mkp.Knapsack.pseudo_utilities:
             # In descending of the pseudo utility
 
             # Test if all accumulated resources + new object are inferior to the constraints of the ks
-            if random.random() < 0.5 \
+            if random.uniform(0, 1) < 0.5 \
                     and False not in [x < y for x, y in
                                       zip([a + b for a, b in
                                            zip(accumulated_resources, list_items[j].weight)], ks.constraints)]:
@@ -107,9 +108,9 @@ def generate_sol(prey, individual, transform_function=math.tanh):
     """
     r = random.uniform(-2, 2)
     trial_list = [x - r * abs(x - y) for x, y in zip(prey, individual.ks)]
-    trial = [1 if random.uniform(0, 1) < transform_function(x) else 0 for x in trial_list]
+    trial = [1 if random.uniform(0, 1) < abs(transform_function(x)) else 0 for x in trial_list]
 
-    ks = Knapsack(individual.constraints, individual.items)
+    ks = mkp.Knapsack(individual.constraints, individual.items)
     ks.ks = trial[:]
 
     ks.fit()
@@ -129,28 +130,29 @@ def repair(individual):
     """
     resource_consumption = []
     for weight_i in range(len(individual.constraints)):
-        resource_consumption += [sum([Knapsack.items[i].weight[weight_i] for i, val in
+        resource_consumption += [sum([mkp.Knapsack.items[i].weight[weight_i] for i, val in
                                       enumerate(individual.ks) if val == 1])]
 
-    for i in reversed(Knapsack.pseudo_utilities):
+    for i in reversed(mkp.Knapsack.pseudo_utilities):
         # Test if all the constraints are respected
         if False in [res <= const for res, const in zip(resource_consumption, individual.constraints)]:
             if individual.ks[i] == 1:
                 individual.ks[i] = 0
                 resource_consumption = [res - weight for res, weight in
-                                        zip(resource_consumption, Knapsack.items[i].weight)]
-                individual.fitness -= Knapsack.items[i].profit
+                                        zip(resource_consumption, mkp.Knapsack.items[i].weight)]
+                individual.fitness -= mkp.Knapsack.items[i].profit
         else:
             break
 
-    for i in Knapsack.pseudo_utilities:
-        if not (False in [res + weight <= const for res, const, weight in
-                          zip(resource_consumption, individual.constraints, Knapsack.items[i].weight)]):
-            if individual.ks[i] == 0:
+    for i in mkp.Knapsack.pseudo_utilities:
+        if individual.ks[i] == 0:
+            if not (False in [res + weight <= const for res, const, weight in
+                              zip(resource_consumption, individual.constraints, mkp.Knapsack.items[i].weight)]):
+
                 individual.ks[i] = 1
                 resource_consumption = [res + weight for res, weight in
-                                        zip(resource_consumption, Knapsack.items[i].weight)]
-                individual.fitness += Knapsack.items[i].profit
+                                        zip(resource_consumption, mkp.Knapsack.items[i].weight)]
+                individual.fitness += mkp.Knapsack.items[i].profit
 
 
 def gwo(list_items, list_constraints, max_iteration=5000, population_size=20):
@@ -206,14 +208,15 @@ def gwo(list_items, list_constraints, max_iteration=5000, population_size=20):
                 individual.ks = trial_solution.ks[:]
                 individual.fitness = trial_solution.fitness
 
-        if iteration % 1000 == 0:
+        if iteration % 500 == 0:
             print(str(iteration) + " : " + str(alpha.fitness))
     return alpha
 
 
-# items, knapsack, optimum = open_instance("../instances/gk/gk01.dat")
+# items, knapsack, optimum = mkp.open_instance("../instances/gk/gk01.dat")
+# items, knapsack, optimum = mkp.open_instance("../instances/chubeas/OR5x100.dat")
 # random.seed(10)
-# sol = gwo(items[0], knapsack[0])
+# sol = gwo(items[4], knapsack[4])
 # print(sol.fitness)
 # print(optimum)
 

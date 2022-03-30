@@ -28,9 +28,9 @@ def open_instance(path):
 
     nbr_instances = 1
     items = []
-    knapsack = []
+    constraints = []
 
-    optimum_value = 0
+    optimum_value = []
 
     with open(path, "r") as file:
 
@@ -50,7 +50,8 @@ def open_instance(path):
             nbr_items = int(firstLine[0])
 
             nbr_constraints = int(firstLine[1])
-            optimum_value = int(firstLine[2])
+            #optimum_value = int(firstLine[2])
+            optimum_value += [int(firstLine[2])]
 
             # Get profits
             i = 0
@@ -74,19 +75,19 @@ def open_instance(path):
                     j += 1
                 i += len(line)
 
-            # Get knapsack sizes
+            # Get constraints
             i = 0
             while i < nbr_constraints:
                 line = file.readline()[1:].split()
-                knapsack += [[]]
+                constraints += [[]]
                 for size in line:
-                    knapsack[instance] += [int(size)]
+                    constraints[instance] += [int(size)]
                 i += len(line)
 
             # For next iteration
             firstLine = file.readline()[1:].split(" ")[:-1]
 
-    return items, knapsack, optimum_value
+    return items, constraints, optimum_value
 
 
 class Knapsack:
@@ -102,19 +103,24 @@ class Knapsack:
     items = None
     pseudo_utilities = None
 
-    def __init__(self, size, list_items):
+    def __init__(self, size, list_items, pseudo_utility="linear_relaxation"):
         """
         :param size: List of constraints for the knapsack
         :type size: list of int
         :param list_items: The list of the different items of the problem
         :type list_items: list of Item
+        :param pseudo_utility: The pseudo utility to calculate
+        :type pseudo_utility: str
         """
         self.constraints = size
         self.ks = [0] * len(list_items)
         if Knapsack.items is None:
             Knapsack.items = list_items
         if Knapsack.pseudo_utilities is None:
-            Knapsack.pseudo_utilities = Knapsack.pseudo_utility(self)
+            if pseudo_utility == "linear_relaxation":
+                Knapsack.pseudo_utilities = Knapsack.pseudo_utility(self)
+            elif pseudo_utility == "scaled":
+                Knapsack.pseudo_utilities = Knapsack.pseudo_utility_2(self)
         self.fitness = 0
 
     @staticmethod
@@ -141,11 +147,11 @@ class Knapsack:
         Calculate the fitness of the knapsack
         """
         # Commented cause repair makes it useless ? (it check if the constraints are respected)
-        # if self.respect_constraints():
-        # Sum of all profits of the items in the knapsack
-        self.fitness = sum([Knapsack.items[i].profit for i, val in enumerate(self.ks) if val == 1])
-        # else:
-        # self.fitness = 0
+        if self.respect_constraints():
+            # Sum of all profits of the items in the knapsack
+            self.fitness = sum([Knapsack.items[i].profit for i, val in enumerate(self.ks) if val == 1])
+        else:
+            self.fitness = 0
 
     # Several ways of doing it
     def pseudo_utility(self):
@@ -153,7 +159,7 @@ class Knapsack:
         Compute the pseudo utility of each item (linear relaxation of MKP)
 
         :rtype: list of float
-        :return: The pseudo utility of each Item
+        :return: The pseudo utility of each Item sorted
         """
 
         # constraints + ones
@@ -164,7 +170,6 @@ class Knapsack:
         i_weight = - np.concatenate((weight, np.eye(len(Knapsack.items))), axis=1)
         # Inverse of profits
         i_profit = - np.array([item.profit for item in Knapsack.items])
-
         # Compute the linear relaxation of MKP
         # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linprog.html
         result = linprog(constraints, i_weight, i_profit)
@@ -174,6 +179,16 @@ class Knapsack:
             pseudo_utilities = (-i_profit).T / (np.matmul(shadow_price.T, weight.T))
 
             return (- pseudo_utilities).argsort()
+
+    def pseudo_utility_2(self):
+        """
+        Compute the pseudo utility of each item (scaled)
+
+        :rtype: list of float
+        :return: The pseudo utility of each Item sorted
+        """
+        return [item.profit/sum([item.weight[i]/self.constraints[i] for i in range(len(self.constraints))])
+                for item in self.items]
 
     def respect_constraints(self):
         """
