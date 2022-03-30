@@ -13,11 +13,6 @@
 - bGWO
   - [ ] Find where to generalize
 - SLMS
-  - [ ] Make an algorithm from scratch
-    - [X] Initialisation random
-    - [X] Generate initial solution
-    - [ ] Generate solution
-      - [X] Repair
   - [ ] Find where to generalize
 
 - General algorithm
@@ -43,6 +38,13 @@
     - [X] Repair (mutate)
     - [X] Update population (Insertion)
     - [X] Frame
+
+- SLMS
+    - [X] Make an algorithm from scratch
+    - [X] Initialisation random
+    - [X] Generate initial solution
+    - [X] Generate solution
+      - [X] Repair
 
 
 ### Dependencies
