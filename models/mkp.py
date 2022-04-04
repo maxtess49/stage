@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.optimize import linprog
 
+import sys
+
 
 class Item:
     """
@@ -35,14 +37,14 @@ def open_instance(path):
     with open(path, "r") as file:
 
         # Remove the first object of the line if it's a blank
-        firstLine = file.readline().split(" ")
+        firstLine = file.readline().split()
         if firstLine[0] == "":
             firstLine = firstLine[1:]
 
         # Get nbr of instances if defined
         if firstLine[1] == "\n":
             nbr_instances = int(firstLine[0])
-            firstLine = file.readline()[1:].split(" ")
+            firstLine = file.readline().split()
 
         # Get all instances
         for instance in range(nbr_instances):
@@ -56,7 +58,9 @@ def open_instance(path):
             # Get profits
             i = 0
             while i < nbr_items:
-                line = file.readline()[1:].split()
+                line = file.readline().split()
+                if line[0] == "":
+                    line = line[1:]
                 for profit in line:
                     item = Item()
                     item.profit = int(profit)
@@ -67,7 +71,9 @@ def open_instance(path):
             j = 0
             # Get weights
             while i < nbr_items * nbr_constraints:
-                line = file.readline()[1:].split()
+                line = file.readline().split()
+                if line[0] == "":
+                    line = line[1:]
                 for weight in line:
                     if j % nbr_items == 0:
                         j = 0
@@ -77,9 +83,11 @@ def open_instance(path):
 
             # Get constraints
             i = 0
+            constraints += [[]]
             while i < nbr_constraints:
-                line = file.readline()[1:].split()
-                constraints += [[]]
+                line = file.readline().split()
+                if line[0] == "":
+                    line = line[1:]
                 for size in line:
                     constraints[instance] += [int(size)]
                 i += len(line)
@@ -147,11 +155,11 @@ class Knapsack:
         Calculate the fitness of the knapsack
         """
         # Commented cause repair makes it useless ? (it check if the constraints are respected)
-        if self.respect_constraints():
+        #if self.respect_constraints():
             # Sum of all profits of the items in the knapsack
-            self.fitness = sum([Knapsack.items[i].profit for i, val in enumerate(self.ks) if val == 1])
-        else:
-            self.fitness = 0
+        self.fitness = sum([Knapsack.items[i].profit for i, val in enumerate(self.ks) if val == 1])
+        #else:
+        #    self.fitness = 0
 
     # Several ways of doing it
     def pseudo_utility(self):
@@ -174,11 +182,16 @@ class Knapsack:
         # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linprog.html
         result = linprog(constraints, i_weight, i_profit)
 
+        if not result.success:
+            result = linprog(constraints, i_weight, i_profit, method="revised simplex")
+
         if result.success:
             shadow_price = result.x[:len(self.constraints)]
             pseudo_utilities = (-i_profit).T / (np.matmul(shadow_price.T, weight.T))
 
             return (- pseudo_utilities).argsort()
+        else:
+            sys.exit("No linear relaxation was successful")
 
     def pseudo_utility_2(self):
         """
@@ -187,8 +200,9 @@ class Knapsack:
         :rtype: list of float
         :return: The pseudo utility of each Item sorted
         """
-        return [item.profit/sum([item.weight[i]/self.constraints[i] for i in range(len(self.constraints))])
-                for item in self.items]
+        pseudo_utilities = np.array([item.profit/sum([item.weight[i]/self.constraints[i] for i in range(len(self.constraints))])
+                for item in self.items])
+        return (- pseudo_utilities).argsort()
 
     def respect_constraints(self):
         """

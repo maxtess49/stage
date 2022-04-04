@@ -15,7 +15,7 @@ def pop_init_random(population_size, list_items, list_constraints):
     :param list_constraints: List of constraints for this knapsack
     :type list_constraints: list of int
 
-    :rtype: list of Knapsack
+    :rtype: list of mkp.Knapsack
     :return: The population
     """
     population = []
@@ -111,7 +111,7 @@ def calc_step(length, beta):
 
 def levyFlight(individuals, scaleFactor, beta=1.5):
     """
-    Calculate the Lévy flight for each moth
+    Calculate the Lévy flight for each moth in population and mutate them
 
     :param individuals: A population
     :type individuals: list of mkp.Knapsack
@@ -120,8 +120,7 @@ def levyFlight(individuals, scaleFactor, beta=1.5):
     :param beta: The index
     :type beta: float
 
-    :rtype: list of mkp.Knapsack
-    :return: A list of Knapsack mutated
+    :return: None
     """
 
     s = calc_step(len(mkp.Knapsack.items), beta)
@@ -133,13 +132,31 @@ def levyFlight(individuals, scaleFactor, beta=1.5):
 
 # Generation of solution
 def sl(individuals, learningTime, scaleFactor, phi, best):
+    """
+    Self learning algorithm mutate each moth in population
+
+    :param individuals: The population to move
+    :type individuals: list of mkp.Knapsack
+    :param learningTime: Nbr of iteration for computing
+    :type learningTime: float
+    :param scaleFactor: A scale factor ?
+    :type scaleFactor: float
+    :param phi: Acceleration factor
+    :type phi: float
+    :param best: Best known moth
+    :type best: mkp.Knapsack
+
+    :return: None
+    """
     for i in range(len(individuals)):
         for j in range(learningTime):
             new = mkp.Knapsack(individuals[i].constraints, individuals[i].items)
+            # Randomly chose a better individual
             if i == 0:
                 random_better = random.choice(individuals[:i + 1])
             else:
                 random_better = random.choice(individuals[:i])
+            # Update the position of the moth according to the best individual and a better individual
             if random.uniform(0, 1) < 0.5:
                 new.ks = [scaleFactor * (random_better.ks[item] + phi * (best.ks[item] - individuals[i].ks[item]))
                           for item in range(len(mkp.Knapsack.items))]
@@ -153,6 +170,21 @@ def sl(individuals, learningTime, scaleFactor, phi, best):
 
 
 def slms(list_items, list_constraints, maxFit=100000, maxStep=1.0, phi=0.618):
+    """
+    Main moth search algorithm
+
+    :param list_items: List of all the items for the problem
+    :type list_items: list of mkp.Item
+    :param list_constraints: List of all the constraints of the Knapsack
+    :type list_constraints: list of int
+    :param maxFit: max number of call to fitness function
+    :type maxFit: int
+    :param maxStep: Maximum step for Lévy flight
+    :type maxStep: float
+    :param phi: Acceleration factor
+    :type phi: float
+    :return:
+    """
 
     population = pop_init_random(50, list_items, list_constraints)
 
@@ -195,6 +227,6 @@ def slms(list_items, list_constraints, maxFit=100000, maxStep=1.0, phi=0.618):
 # items, knapsack, optimum = mkp.open_instance("../instances/chubeas/OR5x100/OR5x100.dat")
 # items, knapsack, optimum = mkp.open_instance("../instances/gk/gk01.dat")
 # random.seed(10)
-# sol = slms(pop_init_random(50, items[0], knapsack[0]), maxFit=100000)
+# sol = slms(items[0], knapsack[0], maxFit=100000)
 # print(sol.fitness)
 # print(optimum)

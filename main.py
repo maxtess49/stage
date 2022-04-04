@@ -18,15 +18,14 @@ def main():
 
     list_algos = [gwo.gwo, slms.slms]
 
-    path = "./instances"
+    path = "./instances/refaire"
     for root, directories, files in os.walk(path):
         for file in files:
             if not file.endswith(".dat"):
                 break
             items, constraints, optimum = mkp.open_instance(os.path.join(root, file))
 
-            for i in range(len(constraints)):
-
+            for i in range(len(items)):
                 for algo in list_algos:
 
                     max = 0
@@ -35,8 +34,12 @@ def main():
 
                     with open('seeds.csv', 'r') as csvfile:
                         seeds = csv.reader(csvfile, delimiter=';')
+                        n_seed = 1
                         for row in seeds:
                             for seed in row:
+                                print(n_seed)
+                                mkp.Knapsack.items = None
+                                mkp.Knapsack.pseudo_utilities = None
                                 random.seed(seed)
                                 res = algo(items[i], constraints[i]).fitness
 
@@ -47,21 +50,23 @@ def main():
                                     min = res
 
                                 mean += res
-                        mean = mean/len(seeds)
+
+                                n_seed += 1
+                        mean = mean/len(row)
 
                         instanceName = file[:-4]
                         if len(optimum) > 1:
                             instanceName += "_" + str(i)
-                    write_to_csv(max, min, mean, optimum[i], instanceName, result_file)
+                    write_to_csv(max, min, mean, optimum[i], instanceName, algo.__name__, result_file)
 
 
 # Need to add stats
 # Probably ?
-def write_to_csv(maxFit, minFit, mean, optimum, instance_name, file):
+def write_to_csv(maxFit, minFit, mean, optimum, instance_name, algo_name, file):
     # Write to csv
     csv_file = open(file, "a", encoding="UTF8", newline="")
     writer = csv.writer(csv_file)
-    writer.writerow([instance_name, str(minFit), str(maxFit), str(mean), str(optimum)])
+    writer.writerow([instance_name, algo_name, str(minFit), str(maxFit), str(mean), str(optimum)])
     csv_file.close()
 
 

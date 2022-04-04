@@ -6,8 +6,9 @@
     - Develop a kind of general metaheuristics algorithm from those
 
 ### TODO
-- bABC
+- bABC (optional)
 - General algorithm
+  - PSO
 
 ### DOING
 - bGWO
