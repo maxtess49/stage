@@ -1,10 +1,10 @@
 import math
 import random
 
-from models import mkp
-from models.mkp import np
-# import mkp
-# from mkp import np
+# from models import mkp
+# from models.mkp import np
+import mkp
+from mkp import np
 
 
 def pop_init_pseudo(population_size, list_items, list_constraints):

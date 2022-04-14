@@ -160,7 +160,7 @@ class Knapsack:
         self.fitness = sum([Knapsack.items[i].profit for i, val in enumerate(self.ks) if val == 1])
         #else:
         #    self.fitness = 0
-
+    
     # Several ways of doing it
     def pseudo_utility(self):
         """

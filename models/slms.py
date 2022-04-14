@@ -1,7 +1,7 @@
 import math
-# import mkp
+import mkp
 import random
-from models import mkp
+# from models import mkp
 
 
 def pop_init_random(population_size, list_items, list_constraints):
@@ -186,8 +186,10 @@ def slms(list_items, list_constraints, maxFit=100000, maxStep=1.0, phi=0.618):
     :return:
     """
 
+    # Generate initial population
     population = pop_init_random(50, list_items, list_constraints)
 
+    # Discretize, repair & fit
     for individual in population:
         generate_sol(individual)
         repair(individual)
@@ -199,14 +201,17 @@ def slms(list_items, list_constraints, maxFit=100000, maxStep=1.0, phi=0.618):
     generation = 1
     while i < maxFit:
         # Have to change in case population length is odd
+        # Divide population into 2 sub
         pop_1 = population[:int(len(population) / 2)]
         pop_2 = population[int(len(population) / 2):]
 
+        # Update by Lévy flight & self learning
         levyFlight(pop_1, (maxStep / generation ** 2))
         sl(pop_2, 1, random.uniform(0, 1), phi, bestInd)
 
         population = pop_1 + pop_2
 
+        # Discretize, repair & fit
         for individual in population:
             generate_sol(individual)
             repair(individual)
