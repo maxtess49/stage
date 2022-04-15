@@ -13,19 +13,20 @@ maxVel = 1
 
 
 class Particle:
-    def __init__(self, vector, minVelocity, maxVelocity, fitness):
-        self.position = vector
-        self.velocity = [random.uniform(minVel, maxVel) for _ in range(len(vector))]
-        self.best = vector
-        self.fitness = fitness
+    def __init__(self, vector, minVelocity, maxVelocity, fitness_start):
+        self.position = copy.deepcopy(vector)
+        self.velocity = [random.uniform(minVelocity, maxVelocity) for _ in range(len(vector))]
+        self.best = copy.deepcopy(vector)
+        self.fitness = fitness_start
 
 
 def fitness(position, items_list, constraints):
     for weight_i in range(len(constraints)):
-        if constraints[weight_i] >= sum([items_list[i].weight[weight_i] for i, val in enumerate(position) if val == 1]):
-            return sum([items_list[i].profit for i, val in enumerate(position) if val == 1])
-        else:
+        if constraints[weight_i] < sum([items_list[i].weight[weight_i] for i, val in enumerate(position) if val == 1]):
             return 0
+
+    return sum([items_list[i].profit for i, val in enumerate(position) if val == 1])
+
 
 def pso(item_list, constraints, swarm, weights, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
     """
@@ -33,6 +34,8 @@ def pso(item_list, constraints, swarm, weights, cog_coef=2.0, soc_coef=2.0, max_
 
     :param item_list: Items of mkp
     :type item_list: list of Item
+    :param constraints: List of constraints for mkp
+    :type constraints: list of int
     :param swarm: Population
     :type swarm: list of Particle
     :param cog_coef: Cognition coefficient - Typical values are in [1,3]
@@ -49,7 +52,7 @@ def pso(item_list, constraints, swarm, weights, cog_coef=2.0, soc_coef=2.0, max_
     """
 
     swarm.sort(key=lambda x: x.fitness, reverse=True)
-    bestKnown = swarm[0]
+    bestKnown = copy.deepcopy(swarm[0])
 
     num_fitness = 0
 
@@ -66,15 +69,15 @@ def pso(item_list, constraints, swarm, weights, cog_coef=2.0, soc_coef=2.0, max_
                                  for i in range(len(particle.position))]
 
             particle.fitness = fitness(particle.position, item_list, constraints)
-            num_fitness += len(swarm)
 
             if particle.fitness > fitness(particle.best, item_list, constraints):
                 particle.best = copy.deepcopy(particle.position)
             if particle.fitness > fitness(bestKnown.position, item_list, constraints):
                 bestKnown = copy.deepcopy(particle)
+        num_fitness += len(swarm)
+        print(bestKnown.fitness)
 
-    swarm.sort(key=lambda x: x.fitness, reverse=True)
-    return swarm[0]
+    return bestKnown
 
 
 items, knapsack, optimum = open_instance("instances/sac94/hp/hp1.dat")
@@ -91,5 +94,4 @@ for ind in pop:
     swarm_const += [Particle(ind.ks, minVel, maxVel, ind.fitness)]
 
 p = pso(items[0], knapsack[0], swarm_const, [random.random() for _ in range(len(items[0]))], max_fit=1000)
-
 print(p.fitness)
