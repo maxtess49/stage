@@ -3,9 +3,10 @@ import random
 
 import numpy as np
 
-from models import gwo
-from models import slms
+#from models import gwo
+#from models import slms
 from models import mkp
+from models import pso_base
 import os
 # from models.frame import *
 
@@ -16,9 +17,10 @@ def main():
     result_file = "results.csv"
     create_res_file(result_file)
 
-    list_algos = [gwo.gwo, slms.slms]
+    #list_algos = [gwo.gwo, slms.slms]
+    list_algos = [pso_base.pso]
 
-    path = "./instances/refaire"
+    path = "./instances/sac94/weish"
     for root, directories, files in os.walk(path):
         for file in files:
             if not file.endswith(".dat"):

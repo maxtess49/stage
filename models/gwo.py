@@ -1,10 +1,10 @@
 import math
 import random
 
-# from models import mkp
-# from models.mkp import np
-import mkp
-from mkp import np
+from models import mkp
+from models.mkp import np
+# import mkp
+# from mkp import np
 
 
 def pop_init_pseudo(population_size, list_items, list_constraints):
@@ -86,7 +86,7 @@ def generate_prey(alpha, beta, delta, iteration):
         weightB = 0
         weightD = 0
 
-    # Should remove the "5000" to make it a variable
+    # Should remove the "5000" to make it a variable (total iterations)
     return [alpha.ks[x] * weightA + beta.ks[x] * weightB + delta.ks[x] * weightD +
             np.random.normal(0, math.exp(-100*iteration/5000)) for x in range(len(alpha.ks))]
 

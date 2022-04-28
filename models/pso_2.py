@@ -2,8 +2,10 @@ import copy
 import random
 from math import tanh
 
-from models.mkp import *
-from models.gwo import pop_init_pseudo
+from gwo import repair
+from mkp import *
+from slms import pop_init_random
+from gwo import pop_init_pseudo
 
 # Can come & go in both direction for each dimension
 minVel = -1
@@ -26,7 +28,7 @@ def fitness(position, items_list, constraints):
     return sum([items_list[i].profit for i, val in enumerate(position) if val == 1])
 
 
-def pso(item_list, constraints, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
+def pso(item_list, constraints, swarm, weights, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
     """
     Main PSO algorithm
 
@@ -49,17 +51,6 @@ def pso(item_list, constraints, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
     :return: The best particle
     """
 
-    pop = pop_init_pseudo(20, item_list, constraints)
-    for ind in pop:
-        ind.fitness = fitness(ind.ks, item_list, constraints)
-    pop.sort(key=lambda x: x.fitness, reverse=True)
-
-    swarm = []
-    for ind in pop:
-        swarm += [Particle(ind.ks, minVel, maxVel, ind.fitness)]
-
-    weights = [random.random() for _ in range(len(item_list))]
-
     swarm.sort(key=lambda x: x.fitness, reverse=True)
     bestKnown = copy.deepcopy(swarm[0])
 
@@ -68,6 +59,8 @@ def pso(item_list, constraints, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
     while num_fitness < max_fit:
         for particle in swarm:
             for dimension in range(len(particle.position)):
+
+                ## TO CHANGE ACCORDING TO BOTH ALGORITHM ###################################################
                 rand_cog = random.random()
                 rand_soc = random.random()
                 particle.velocity[dimension] = weights[dimension] * particle.velocity[dimension] \
@@ -76,6 +69,8 @@ def pso(item_list, constraints, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
 
             particle.position = [1 if random.random() < abs(tanh(particle.position[i] + particle.velocity[i])) else 0
                                  for i in range(len(particle.position))]
+
+            ################################################################################################
 
             particle.fitness = fitness(particle.position, item_list, constraints)
 
@@ -89,7 +84,18 @@ def pso(item_list, constraints, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
     return bestKnown
 
 
-#items, knapsack, optimum = open_instance("instances/gk/gk08.dat")
+items, knapsack, optimum = open_instance("instances/gk/gk08.dat")
 
-#p = pso(items[0], knapsack[0], swarm_const, [random.random() for _ in range(len(items[0]))], max_fit=1000)
-#print(p.fitness)
+# pop = pop_init_random(20, items[0], knapsack[0])
+pop = pop_init_pseudo(20, items[0], knapsack[0])
+for ind in pop:
+    #ind.fit()
+    ind.fitness = fitness(ind.ks, items[0], knapsack[0])
+pop.sort(key=lambda x: x.fitness, reverse=True)
+
+swarm_const = []
+for ind in pop:
+    swarm_const += [Particle(ind.ks, minVel, maxVel, ind.fitness)]
+
+p = pso(items[0], knapsack[0], swarm_const, [random.random() for _ in range(len(items[0]))], max_fit=1000)
+print(p.fitness)
