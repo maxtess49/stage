@@ -7,6 +7,7 @@ import numpy as np
 #from models import slms
 from models import mkp
 from models import pso_base
+from models import pso_2
 import os
 # from models.frame import *
 
@@ -14,13 +15,13 @@ import os
 def main():
     # items, constraints, optimum = mkp.open_instance("./instances/chubeas/OR5x100/OR5x100.dat")
 
-    result_file = "results.csv"
+    result_file = "results_gk_pso_2_repair.csv"
     create_res_file(result_file)
 
     #list_algos = [gwo.gwo, slms.slms]
-    list_algos = [pso_base.pso]
+    list_algos = [pso_2.pso]
 
-    path = "./instances/sac94/weish"
+    path = "./instances/gk"
     for root, directories, files in os.walk(path):
         for file in files:
             if not file.endswith(".dat"):
