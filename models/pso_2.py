@@ -108,13 +108,16 @@ def pso(item_list, constraints, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
                 ## TO CHANGE ACCORDING TO BOTH ALGORITHM ###################################################
                 rand_cog = random.random()
                 rand_soc = random.random()
+                # Based on metaphor-based algorithms
                 particle.velocity[dimension] = particle.best[dimension] + random.random() * (particle.best[dimension] - particle.position[dimension])
-                #particle.velocity[dimension] = weights[dimension] * rand_cog * (particle.best[dimension]) + i_weights[dimension] * rand_soc * (bestKnown.position[dimension] - particle.position[dimension])
+
+                # Based on pso (Particle Swarm Optimization for the Multidimensional Knapsack Problem)
+                # particle.velocity[dimension] = weights[dimension] * rand_cog * (particle.best[dimension]) + i_weights[dimension] * rand_soc * (bestKnown.position[dimension] - particle.position[dimension])
 
             particle.position = [1 if random.random() < abs(tanh(particle.position[i] + particle.velocity[i])) else 0
                                  for i in range(len(particle.position))]
 
-            repair(particle, constraints)
+            #repair(particle, constraints)
 
             ################################################################################################
 

@@ -6,16 +6,9 @@
     - Develop a kind of general metaheuristics algorithm from those
 
 ### TODO
-- bABC (optional)
 - General algorithm
-  - PSO
 
 ### DOING
-- bGWO
-  - [ ] Find where to generalize
-- SLMS
-  - [ ] Find where to generalize
-
 - General algorithm
   - [ ] Get a framework working
   - [ ] (optionnal) make it with the deap library
@@ -39,6 +32,7 @@
     - [X] Repair (mutate)
     - [X] Update population (Insertion)
     - [X] Frame
+  - [X] find where to generalize
 
 - SLMS
     - [X] Make an algorithm from scratch
@@ -46,6 +40,14 @@
     - [X] Generate initial solution
     - [X] Generate solution
       - [X] Repair
+    - [X] find where to generalize
+
+- PSO
+  - [X] Make a simple PSO 
+    - [X] Modify it to try to get better results
+    - [ ] Use parts of metaphor based algorithm to make a general pso algorithm resembling both gwo & slms
+      - [X] use different formulas
+      - [ ] Change the framework of the pso to look like gwo & slms
 
 
 ### Dependencies

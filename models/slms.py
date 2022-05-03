@@ -1,7 +1,7 @@
 import math
-import mkp
+#import mkp
 import random
-# from models import mkp
+from models import mkp
 
 
 def pop_init_random(population_size, list_items, list_constraints):
