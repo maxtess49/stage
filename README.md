@@ -2,7 +2,12 @@
 ## Project of my internship at LERIA 
 
 ### Objectives: 
-    - Implement bGWO, bMS, bABC 
+    - Implement bGWO, SLMS
+      - A binary grey wolf optimizer for the multidimensional knapsack problem
+        (Kaiping Luo, Qiuhong Zhao)
+      - A binary moth search algorithm based on self-learning for multidimensional knapsack problems  
+        (Yanhong Feng, Gai-Ge Wang)
+
     - Develop a kind of general metaheuristics algorithm from those
 
 ### TODO
