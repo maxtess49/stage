@@ -61,7 +61,7 @@ def repair(individual, constraints):
                                         zip(resource_consumption, Knapsack.items[i].weight)]
                 individual.fitness += Knapsack.items[i].profit
 
-def pso(item_list, constraints, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
+def pso(item_list, constraints, cog_coef=2.0, soc_coef=2.0, max_fit=100000, formula=0):
     """
     Main PSO algorithm
 
@@ -109,15 +109,34 @@ def pso(item_list, constraints, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
                 rand_cog = random.random()
                 rand_soc = random.random()
                 # Based on metaphor-based algorithms
-                particle.velocity[dimension] = particle.best[dimension] + random.random() * (particle.best[dimension] - particle.position[dimension])
+                # used
+                if formula == 5:
+                    particle.velocity[dimension] = particle.best[dimension] + random.random() * (particle.best[dimension] - particle.position[dimension])
+
+                # Looks like abc (gwo a un - avant le rand et un autre rand dans les () et c'est pas le best mais une nouvelle solution mais bon ..)
+                if formula == 6:
+                    particle.velocity[dimension] = bestKnown.position[dimension] + random.random() * (bestKnown.position[dimension] - particle.position[dimension])
+
+                # looks like slms
+                if formula == 4:
+                    particle.velocity[dimension] = particle.position[dimension] + random.random() * (bestKnown.position[dimension] - particle.position[dimension])
+
+                # To test - formule 1, 2, 3
+                if formula == 1:
+                    particle.velocity[dimension] = particle.best[dimension] + random.random() * (bestKnown.position[dimension] - particle.position[dimension])
+                if formula == 2:
+                    particle.velocity[dimension] = bestKnown.position[dimension] + random.random() * (particle.best[dimension] - particle.position[dimension])
+                if formula == 3:
+                    particle.velocity[dimension] = particle.position[dimension] + random.random() * (particle.best[dimension] - particle.position[dimension])
 
                 # Based on pso (Particle Swarm Optimization for the Multidimensional Knapsack Problem)
-                # particle.velocity[dimension] = weights[dimension] * rand_cog * (particle.best[dimension]) + i_weights[dimension] * rand_soc * (bestKnown.position[dimension] - particle.position[dimension])
+                if formula == 0:
+                    particle.velocity[dimension] = weights[dimension] * rand_cog * (particle.best[dimension]) + i_weights[dimension] * rand_soc * (bestKnown.position[dimension] - particle.position[dimension])
 
             particle.position = [1 if random.random() < abs(tanh(particle.position[i] + particle.velocity[i])) else 0
                                  for i in range(len(particle.position))]
 
-            #repair(particle, constraints)
+            repair(particle, constraints)
 
             ################################################################################################
 
@@ -132,6 +151,23 @@ def pso(item_list, constraints, cog_coef=2.0, soc_coef=2.0, max_fit=100000):
 
     return bestKnown
 
+def pso1(item_list, constraints):
+    return pso(item_list, constraints, formula=1)
+
+def pso2(item_list, constraints):
+    return pso(item_list, constraints, formula=2)
+
+def pso3(item_list, constraints):
+    return pso(item_list, constraints, formula=3)
+
+def pso4(item_list, constraints):
+    return pso(item_list, constraints, formula=4)
+
+def pso5(item_list, constraints):
+    return pso(item_list, constraints, formula=5)
+
+def pso6(item_list, constraints):
+    return pso(item_list, constraints, formula=6)
 
 # items, knapsack, optimum = open_instance("instances/gk/gk08.dat")
 #

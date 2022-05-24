@@ -182,16 +182,15 @@ class Knapsack:
         # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linprog.html
         result = linprog(constraints, i_weight, i_profit)
 
-        if not result.success:
-            result = linprog(constraints, i_weight, i_profit, method="revised simplex")
+        # if not result.success:
+        #     result = linprog(constraints, i_weight, i_profit, method="revised simplex")
 
-        if result.success:
-            shadow_price = result.x[:len(self.constraints)]
-            pseudo_utilities = (-i_profit).T / (np.matmul(shadow_price.T, weight.T))
+        shadow_price = result.x[:len(self.constraints)]
+        pseudo_utilities = (-i_profit).T / (np.matmul(shadow_price.T, weight.T))
 
-            return (- pseudo_utilities).argsort()
-        else:
-            sys.exit("No linear relaxation was successful")
+        print((- pseudo_utilities).argsort())
+
+        return (- pseudo_utilities).argsort()
 
     def pseudo_utility_2(self):
         """

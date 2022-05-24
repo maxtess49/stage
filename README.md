@@ -12,6 +12,7 @@
 
 ### TODO
 - General algorithm
+- Clean all files and add docstrings & comments
 
 ### DOING
 - General algorithm

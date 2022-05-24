@@ -15,13 +15,13 @@ import os
 def main():
     # items, constraints, optimum = mkp.open_instance("./instances/chubeas/OR5x100/OR5x100.dat")
 
-    result_file = "results.csv"
+    result_file = "results_2.csv"
     create_res_file(result_file)
 
-    #list_algos = [gwo.gwo, slms.slms]
-    list_algos = [pso_2.pso]
+    #list_algos = [gwo.gwo, slms.slms, pso_base.pso, pso_2.pso, pso_2.pso1, pso_2.pso2, pso_2.pso3, pso_2.pso4, pso_2.pso5, pso_2.pso6]
+    list_algos = [pso_2.pso, pso_2.pso1, pso_2.pso2, pso_2.pso3, pso_2.pso4, pso_2.pso5, pso_2.pso6]
 
-    path = "./instances/refaire"
+    path = "./instances/todo"
     for root, directories, files in os.walk(path):
         for file in files:
             if not file.endswith(".dat"):

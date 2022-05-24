@@ -1,7 +1,9 @@
+import copy
 import math
-#import mkp
+# import mkp
 import random
 from models import mkp
+from copy import deepcopy
 
 
 def pop_init_random(population_size, list_items, list_constraints):
@@ -124,10 +126,13 @@ def levyFlight(individuals, scaleFactor, beta=1.5):
     """
 
     s = calc_step(len(mkp.Knapsack.items), beta)
+    print("ind base + ind modif levy")
     for i in range(len(individuals)):
+        print(individuals[i].ks)
         L = ((beta - 1) * math.gamma(beta - 1) * math.sin(math.pi * (beta - 1) / 2)) \
             / (math.pi * s[i] ** beta)
         individuals[i].ks = [item + scaleFactor * L for item in individuals[i].ks]
+        print(individuals[i].ks)
 
 
 # Generation of solution
@@ -148,22 +153,30 @@ def sl(individuals, learningTime, scaleFactor, phi, best):
 
     :return: None
     """
+    newInd = copy.deepcopy(individuals)
     for i in range(len(individuals)):
         for j in range(learningTime):
-            new = mkp.Knapsack(individuals[i].constraints, individuals[i].items)
+            new = mkp.Knapsack(newInd[i].constraints, newInd[i].items)
             # Randomly chose a better individual
             if i == 0:
-                random_better = random.choice(individuals[:i + 1])
+                random_better = random.choice(newInd[:i + 1])
             else:
-                random_better = random.choice(individuals[:i])
+                random_better = random.choice(newInd[:i])
             # Update the position of the moth according to the best individual and a better individual
+            print("rand better + best + ind & sl improved + sl improved discrete")
+            print(random_better.ks)
+            print(best.ks)
+            print(newInd[i].ks)
             if random.uniform(0, 1) < 0.5:
-                new.ks = [scaleFactor * (random_better.ks[item] + phi * (best.ks[item] - individuals[i].ks[item]))
+                new.ks = [scaleFactor * (random_better.ks[item] + phi * (best.ks[item] - newInd[i].ks[item]))
                           for item in range(len(mkp.Knapsack.items))]
             else:
-                new.ks = [scaleFactor * (random_better.ks[item] + (1 / phi) * (best.ks[item] - individuals[i].ks[item]))
+                new.ks = [scaleFactor * (random_better.ks[item] + (1 / phi) * (best.ks[item] - newInd[i].ks[item]))
                           for item in range(len(mkp.Knapsack.items))]
+            print(new.ks)
+            generate_sol(new)
             new.fit()
+            print(new.ks)
             if new.fitness > individuals[i].fitness:
                 individuals[i] = new
         individuals[i] = new
@@ -195,7 +208,7 @@ def slms(list_items, list_constraints, maxFit=100000, maxStep=1.0, phi=0.618):
         repair(individual)
         individual.fit()
     population.sort(key=lambda x: x.fitness, reverse=True)
-    bestInd = population[0]
+    bestInd = copy.deepcopy(population[0])
 
     i = 0
     generation = 1
@@ -213,15 +226,18 @@ def slms(list_items, list_constraints, maxFit=100000, maxStep=1.0, phi=0.618):
 
         # Discretize, repair & fit
         for individual in population:
+            print("non discret ind & discretized")
+            print(individual.ks)
             generate_sol(individual)
             repair(individual)
+            print(individual.ks)
             individual.fit()
         population.sort(key=lambda x: x.fitness, reverse=True)
 
         i += len(population)
         generation += 1
 
-        bestInd = population[0]
+        bestInd = copy.deepcopy(population[0])
 
         if generation % 500 == 0:
             print("generation: " + str(generation) + " best fitness: " + str(population[0].fitness))
@@ -232,6 +248,10 @@ def slms(list_items, list_constraints, maxFit=100000, maxStep=1.0, phi=0.618):
 # items, knapsack, optimum = mkp.open_instance("../instances/chubeas/OR5x100/OR5x100.dat")
 # items, knapsack, optimum = mkp.open_instance("../instances/gk/gk01.dat")
 # random.seed(10)
-# sol = slms(items[0], knapsack[0], maxFit=100000)
+# random.seed(0)
+# items, knapsack, optimum = mkp.open_instance("../instances/sac94/weish/weish01.dat")
+# sol = slms(items[0], knapsack[0])
+# print("sol ks + fitness + opti")
+# print(sol.ks)
 # print(sol.fitness)
 # print(optimum)

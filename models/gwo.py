@@ -88,7 +88,7 @@ def generate_prey(alpha, beta, delta, iteration):
 
     # Should remove the "5000" to make it a variable (total iterations)
     return [alpha.ks[x] * weightA + beta.ks[x] * weightB + delta.ks[x] * weightD +
-            np.random.normal(0, math.exp(-100*iteration/5000)) for x in range(len(alpha.ks))]
+            np.random.normal(0, math.exp(-100*iteration/1)) for x in range(len(alpha.ks))]
 
 
 # Generate a trial solution
@@ -181,9 +181,15 @@ def gwo(list_items, list_constraints, max_iteration=5000, population_size=20):
         for individual in pop:
             # Can remove the for loop with list comprehension
             # for item in individual.ks:
+            # print("a, b, d, prey, ind")
+            # print(alpha.ks)
+            # print(beta.ks)
+            # print(delta.ks)
+            # print(prey)
+            # print(individual.ks)
             trial_solution = generate_sol(prey, individual)
-
             repair(trial_solution)
+            # print(trial_solution.ks)
 
             # Intensification I suppose
             if trial_solution.fitness > individual.fitness:
@@ -214,9 +220,12 @@ def gwo(list_items, list_constraints, max_iteration=5000, population_size=20):
 
 
 # items, knapsack, optimum = mkp.open_instance("../instances/gk/gk01.dat")
-# items, knapsack, optimum = mkp.open_instance("../instances/chubeas/OR5x100.dat")
-# random.seed(10)
-# sol = gwo(items[4], knapsack[4])
+# random.seed(0)
+# items, knapsack, optimum = mkp.open_instance("../instances/sac94/weish/weish01.dat")
+# sol = gwo(items[0], knapsack[0], max_iteration=1)
+# print("ks final")
+# print(sol.ks)
+# print("fit + opti")
 # print(sol.fitness)
 # print(optimum)
 
@@ -230,3 +239,12 @@ def gwo(list_items, list_constraints, max_iteration=5000, population_size=20):
 #         repair(trial_solution)
 #     if i % 1000 == 0:
 #         print(i)
+
+# random.seed(0)
+# items, knapsack, optimum = mkp.open_instance("../instances/modified.dat")
+# sol = gwo(items[0], knapsack[0], max_iteration=1)
+# print("sol ks + fitness + opti")
+# print(sol.ks)
+# print(sol.fitness)
+# print(optimum)
+
